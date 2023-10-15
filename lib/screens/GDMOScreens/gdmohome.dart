@@ -287,6 +287,27 @@ class _HomescreenState extends State<GDMOHomescreen> {
               ),
             ],
           ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                height: 80,
+              ),
+              Text(
+                "ਲਿੰਗ ਨਿਰਧਾਰਣ ਕਾਨੂੰਨੀ ਅਪਰਾਧ ਹੈ।",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+              Text(
+                "Sex determination is a legal offense.",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -314,6 +335,7 @@ class _HomescreenState extends State<GDMOHomescreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextFormField(
+                                    maxLength: 10,
                                     controller: SearchController,
                                     decoration: InputDecoration(
                                         labelText: "Enter Mobile / RCH ID"),
