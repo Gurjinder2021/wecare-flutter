@@ -318,6 +318,7 @@ class _HomescreenState extends State<ASHAHomescreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextFormField(
+                                    maxLength: 10,
                                     controller: SearchController,
                                     decoration: InputDecoration(
                                         labelText: "Enter Mobile / RCH ID"),
