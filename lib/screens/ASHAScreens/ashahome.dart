@@ -9,7 +9,7 @@ import 'package:Sujatha/reusables.dart';
 import 'package:http/http.dart' as http;
 import 'package:Sujatha/screens/ASHAScreens/addpatient.dart';
 import 'package:Sujatha/screens/ASHAScreens/updatepatient.dart';
-import 'package:Sujatha/screens/ASHAScreens/smohome.dart';
+import 'package:Sujatha/screens/SMOScreens/smohome.dart';
 
 
 class ASHAHomescreen extends StatefulWidget {
@@ -269,7 +269,7 @@ class _HomescreenState extends State<ASHAHomescreen> {
                       },
                       child: btncard(Icons.person_add, "Add Patient"),
                     ),
-                    /*InkWell(
+                    InkWell(
                       onTap:() {
                         Navigator.push(
                         context,
@@ -280,7 +280,7 @@ class _HomescreenState extends State<ASHAHomescreen> {
                     );
                     },
                       child: btncard(Icons.edit_calendar, "SMO Dashboard"),
-                    ),*/
+                    ),
                     InkWell(
                       onTap: callbottom,
                       child: btncard(Icons.edit_calendar, "Update Patient"),
