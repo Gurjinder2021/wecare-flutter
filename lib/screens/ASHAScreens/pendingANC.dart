@@ -4,22 +4,22 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/material/colors.dart';
 import 'package:Sujatha/models/patient.dart';
 import 'package:Sujatha/reusables.dart';
 import 'package:http/http.dart' as http;
-import 'package:Sujatha/screens/ASHAScreens/addpatient.dart';
+import 'package:Sujatha/screens/colors.dart';
 import 'package:Sujatha/screens/ASHAScreens/updatepatient.dart';
-import 'package:Sujatha/screens/ASHAScreens/smohome.dart';
 
 
-class ASHAHomescreen extends StatefulWidget {
-  const ASHAHomescreen({super.key});
+class ANCPending extends StatefulWidget {
+  const ANCPending({super.key});
 
   @override
-  State<ASHAHomescreen> createState() => _HomescreenState();
+  State<ANCPending> createState() => _HomescreenState();
 }
 
-class _HomescreenState extends State<ASHAHomescreen> {
+class _HomescreenState extends State<ANCPending> {
   bool _shouldGetData = true;
   String _name = "";
   String _mobile = "";
@@ -45,7 +45,6 @@ class _HomescreenState extends State<ASHAHomescreen> {
       var jsonData = json.decode(res.body);
 
       record = jsonData;
-      print(record);
       //print(record);
       listpats.clear();
       listvnames.clear();
@@ -116,7 +115,7 @@ class _HomescreenState extends State<ASHAHomescreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    var size = MediaQuery.of(context).size;
     return !loaded
         ? Center(
             child: CircularProgressIndicator(
@@ -180,21 +179,14 @@ class _HomescreenState extends State<ASHAHomescreen> {
                   ),
                   ListTile(
                     leading: Icon(Icons.person),
-                    title: Text(_anm),
-                    subtitle: Text("Reporting ANM"),
+                    title: Text("Dr. Anil Goyal"),
+                    subtitle: Text("Reporting CMO"),
                   ),
                   Divider(),
-                  ListTile(title: Text("Coverage Area"),),
-                  Flexible(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: village!.values.toList().length,
-                        itemBuilder:(context,i){
-                            return ListTile(
-                                leading: Icon(Icons.map_rounded),
-                                title:Text(village!.values.toList()[i])); //village!.values.toList()[0]
-                        }),
-                  )
+                  ListTile(title: Text("Block"),),
+                  ListTile(
+                    leading: Icon(Icons.map_rounded),
+                    title: Text(_block),),
                 ],
               ),
             ),
@@ -254,39 +246,212 @@ class _HomescreenState extends State<ASHAHomescreen> {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Center(
+                  child: Container(
+                    //width: MediaQuery.of(context).size.width * 0.4, // 40% of screen width
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        singleBoxDesign(Icons.person_add, "10\nTotal ANC Pending"),
+                      ],
+                    ),
+                  ),
+                ),
+                Divider(),
+                /*Column(   //This is box type view with two box in one row
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                AddNewPatient(_distcode.toString(), _blockcode.toString()),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "50\n\nTotal ANC"),
                           ),
-                        );
-                      },
-                      child: btncard(Icons.person_add, "Add Patient"),
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "10\n \nPending ANC"),
+                          ),
+                        ),
+                      ],
                     ),
-                    /*InkWell(
-                      onTap:() {
-                        Navigator.push(
-                        context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  SMOHomescreen(),
-                    ),
-                    );
-                    },
-                      child: btncard(Icons.edit_calendar, "SMO Dashboard"),
-                    ),*/
-                    InkWell(
-                      onTap: callbottom,
-                      child: btncard(Icons.edit_calendar, "Update Patient"),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "30\n\nTotal Deleiveries"),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "10 \nDeleiveries status\nPending"),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
+                ),*/
+                customRow(
+                  Icons.person_add,
+                  "Total ANC",
+                  "50",
+                  size,
+                  bgColor: Colors.green[200],
+                  onTap: () {
+                    // Your code to handle the tap event goes here
+                  },
                 ),
+
+                Card(
+                  elevation: 0,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      splashRadius: 30;
+                      /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SMOHomescreen(),
+                        ),
+                      );*/
+                      // Your code to handle the tap event goes here
+                    },
+                    child: customRow(
+                      Icons.person_add,
+                      "Pending ANC",
+                      "10",
+                      size,
+                      bgColor: Colors.red[300],
+                    ),
+                  ),
+                ),
+
+                customRow(
+                  Icons.person_add,
+                  "Total Deleiveries",
+                  "30",
+                  size,
+                  bgColor: Colors.green[200],
+                  onTap: () {
+                    // Your code to handle the tap event goes here
+                  },
+                ),
+
+                Card(
+                  elevation: 0,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      // Your code to handle the tap event goes here
+                    },
+                    child: customRow(
+                      Icons.person_add,
+                      "Deleiveries status Pending",
+                      "10",
+                      size,
+                      bgColor: Colors.red[300],
+                    ),
+                  ),
+                ),
+                /*Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(
+                          top: 20,
+                          left: 25,
+                          right: 25,
+                        ),
+                        decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color: grey.withOpacity(0.03),
+                                spreadRadius: 10,
+                                blurRadius: 3,
+                                // changes position of shadow
+                              ),
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, bottom: 10, right: 20, left: 20),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: arrowbgColor,
+                                  borderRadius: BorderRadius.circular(15),
+                                  // shape: BoxShape.circle
+                                ),
+                                child: Center(
+                                    child: Icon(Icons.arrow_upward_rounded)),
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Expanded(
+                                child: Container(
+                                  width: (size.width - 90) * 0.7,
+                                  child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Sent",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              color: black,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          "Sending Payment to Clients",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: black.withOpacity(0.5),
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ]),
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "\$150",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: black),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),*/
+
+
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -311,6 +476,9 @@ class _HomescreenState extends State<ASHAHomescreen> {
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 20,
                     ),
                   ],
                 ),
@@ -446,63 +614,3 @@ class MyListViewPatient extends StatelessWidget {
     );
   }
 }
-/*drawer: Drawer(                      //drawer code to repetitive calling getdata()
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(color: Colors.blue),
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CircleAvatar(
-                        radius: 30,
-                        child: Icon(Icons.admin_panel_settings, color: Colors.blue, size: 30,),
-                        // backgroundImage: NetworkImage(_profileimg),
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _name,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          _mobile,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          _role,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text(_anm),
-              subtitle: Text("Reporting ANM"),
-            ),
-            Divider(),
-            ListTile(title: Text("Coverage Area"),),
-            Flexible(
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: village!.values.toList().length,
-                  itemBuilder:(context,i){
-                    return ListTile(
-                        leading: Icon(Icons.map_rounded),
-                        title:Text(village!.values.toList()[i])); //village!.values.toList()[0]
-                  }),
-            )
-          ],
-        ),
-      ),*/

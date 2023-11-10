@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:Sujatha/screens/ANMScreens/anmhome.dart';
 import 'package:Sujatha/screens/ASHAScreens/ashahome.dart';
 import 'package:Sujatha/screens/GDMOScreens/gdmohome.dart';
+import 'package:Sujatha/screens/SMOScreens/smohome.dart';
 
 import '../phone_auth/signin.dart';
 import '../reusables.dart';
@@ -55,6 +56,8 @@ class _SplashScreenState extends State<SplashScreen> {
       nextScreen = ANMHomescreen();
     }else if (roleId == 3) {
       nextScreen = GDMOHomescreen();
+    }else if (roleId == 5) {
+      nextScreen = SMOHomescreen();
     } else {
       maketoast(msg: "No Role Assigned", ctx: context);
       logout();
@@ -113,12 +116,12 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'An Initiative of Health Department',
-                  style: TextStyle(fontSize: 15, color: Colors.white),
+                  'An Initiative of Health Department Faridkot',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
                 Text(
-                  'powered by District Adminsitration Faridkot',
-                  style: TextStyle(fontSize: 15, color: Colors.white),
+                  'District Adminsitration Faridkot',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
 
               ],
@@ -142,6 +145,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final userJson = jsonData['user'];
+        // print(jsonData);  //if user found API returns  {code: 200, user: {name: RASHPAL KAUR, role_id: 1}}
         user = User(
           name: userJson['name'],
           roleId: userJson['role_id'],

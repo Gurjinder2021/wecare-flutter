@@ -1,39 +1,41 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:Sujatha/screens/ASHAScreens/pendingANC.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/material/colors.dart';
 import 'package:Sujatha/models/patient.dart';
 import 'package:Sujatha/reusables.dart';
 import 'package:http/http.dart' as http;
-import 'package:Sujatha/screens/GDMOScreens/gdmopatientsections.dart';
+import 'package:Sujatha/screens/colors.dart';
+import 'package:Sujatha/screens/ASHAScreens/updatepatient.dart';
 
 
-class GDMOHomescreen extends StatefulWidget {
-  const GDMOHomescreen({super.key});
+class SMOHomescreen extends StatefulWidget {
+  const SMOHomescreen({super.key});
 
   @override
-  State<GDMOHomescreen> createState() => _HomescreenState();
+  State<SMOHomescreen> createState() => _HomescreenState();
 }
 
-class _HomescreenState extends State<GDMOHomescreen> {
+class _HomescreenState extends State<SMOHomescreen> {
   bool _shouldGetData = true;
   String _name = "";
   String _mobile = "";
   String _role = "";
   String _district = "";
-  // String _distcode = "";
+  String _distcode = "";
   String _block = "";
-  String _smo = "";
-  // String _blockcode = "";
-  List anms = [];
+  String _anm = "";
+  String _blockcode = "";
+  Map<String, dynamic>? village;
   String _profileimg = "";
   int _index = 0;
   Map<String, dynamic> record = {};
   List<Patient> listpats = [];
   List<String> listvnames = [];
-  List<String> listashanames = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   Future<Map<String, dynamic>> searchRCHorMobile(mob) async {
@@ -44,18 +46,15 @@ class _HomescreenState extends State<GDMOHomescreen> {
       var jsonData = json.decode(res.body);
 
       record = jsonData;
+      //print(record);
       listpats.clear();
       listvnames.clear();
-      listashanames.clear();
       if (record["patient"] != null) {
         for (int k = 0; k < record["patient"].length; k++) {
           var p = Patient.fromJson(record["patient"][k]);
           listpats.add(p);
           String v = record["patient"][k]["village"]["name"];
           listvnames.add(v);
-          String a = record["patient"][k]["asha"]["name"];
-          listashanames.add(a);
-
         }
       }
     } else {
@@ -69,7 +68,7 @@ class _HomescreenState extends State<GDMOHomescreen> {
     try {
       final token = FirebaseAuth.instance.currentUser!.uid;
       var url = Uri.https(
-          'vcare.aims.96.lt', '/api/getGdmoProfile', {'access_token': token});
+          'vcare.aims.96.lt', '/api/getAshaProfile', {'access_token': token});
 
       var response = await http.get(url);
       if (response.statusCode == 200) {
@@ -77,33 +76,24 @@ class _HomescreenState extends State<GDMOHomescreen> {
         if (jsonResponse.containsKey("code")) {
           maketoast(msg: jsonResponse["msg"], ctx: context);
         } else if (jsonResponse.containsKey("id")) {
-
           _name = jsonResponse["name"];
           _mobile = jsonResponse["mobile"];
           _role = jsonResponse["role"] ?? "NA";
           _district = jsonResponse["dist_name"] ?? "NA";
-          // _distcode = jsonResponse["dist_code"].toString();
+          _distcode = jsonResponse["dist_code"].toString();
           _block = jsonResponse["block_name"] ?? "NA";
-          // _blockcode = jsonResponse["block_code"].toString();
-          _smo = jsonResponse["smo"] ?? "NA";
+          _blockcode = jsonResponse["block_code"].toString();
+          _anm = jsonResponse["anm"] ?? "NA";
+          village = jsonResponse["villages"];
           _profileimg = jsonResponse["photo"];
           _shouldGetData = false;
-
-          Map<String, dynamic>? a = jsonResponse["anms"];
-          anms = [];
-          if(a!=null){
-            a.forEach((key, value) {
-              var data = {"anmsid": key, "anmname": value.toString()};
-              anms.add(data);
-            });
-          }
-
         }
       } else {}
     } catch (e) {
       maketoast(msg: "exception:${e.toString()}", ctx: context);
     }
   }
+
 
   final mytextstyle = const TextStyle(
       color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold);
@@ -114,7 +104,7 @@ class _HomescreenState extends State<GDMOHomescreen> {
 
   @override
   void initState() {
-
+    // TODO: implement initState
     super.initState();
     getdata().then((value) {
       setState(() {
@@ -124,17 +114,16 @@ class _HomescreenState extends State<GDMOHomescreen> {
     });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-    return  !loaded
-      ? Center(
+    var size = MediaQuery.of(context).size;
+    return !loaded
+        ? Center(
       child: CircularProgressIndicator(
-      color: Colors.blue,
+        color: Colors.blue,
       ),
-      ):Scaffold(
+    )
+        : Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
         child: Column(
@@ -191,25 +180,24 @@ class _HomescreenState extends State<GDMOHomescreen> {
             ),
             ListTile(
               leading: Icon(Icons.person),
-              title: Text(_smo),
-              subtitle: Text("Reporting SMO"),
+              title: Text("Dr. Anil Goyal"),
+              subtitle: Text("Reporting CMO"),
             ),
             Divider(),
+            ListTile(title: Text("Block"),),
             ListTile(
-              title: Text("Faridkot"),
-              subtitle: Text("District"),
-            ),
-            // Flexible(
-            //   child: ListView.builder(
-            //       shrinkWrap: true,
-            //       itemCount: anms.length,
-            //       itemBuilder: (context, i) {
-            //         print(i);
-            //         return ListTile(
-            //             leading: Icon(Icons.map_rounded),
-            //             title: Text(anms[i]["anmname"]));
-            //       }),
-            // )
+              leading: Icon(Icons.map_rounded),
+              title: Text(_block),),
+            /* Flexible(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: village!.values.toList().length,
+                        itemBuilder:(context,i){
+                            return ListTile(
+                                leading: Icon(Icons.map_rounded),
+                                title:Text(village!.values.toList()[i])); //village!.values.toList()[0]
+                        }),
+                  )*/
           ],
         ),
       ),
@@ -233,9 +221,10 @@ class _HomescreenState extends State<GDMOHomescreen> {
         onTap: (i) {
           setState(() {
             _index = i;
-            if (_index == 1) {
+            if(_index==1){
               _scaffoldKey.currentState!.openDrawer();
-            } else {
+            }
+            else{
               _scaffoldKey.currentState!.closeDrawer();
             }
           });
@@ -243,7 +232,6 @@ class _HomescreenState extends State<GDMOHomescreen> {
       ),
       body: ListView(
         children: [
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -269,27 +257,212 @@ class _HomescreenState extends State<GDMOHomescreen> {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // InkWell(
-              //   onTap: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) =>
-              //             AddNewPatient(_distcode.toString(), _blockcode.toString()),
-              //       ),
-              //     );
-              //   },
-              //   child: btncard(Icons.person_add, "Add Patient"),
-              // ),
-              InkWell(
-                onTap: callbottom,
-                child: btncard(Icons.edit_calendar, "Update Patient"),
+          Center(
+            child: Container(
+              //width: MediaQuery.of(context).size.width * 0.4, // 40% of screen width
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  singleBoxDesign(Icons.person_add, "100\nTotal Patient"),
+                ],
               ),
-            ],
+            ),
           ),
+          Divider(),
+          /*Column(   //This is box type view with two box in one row
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "50\n\nTotal ANC"),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "10\n \nPending ANC"),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "30\n\nTotal Deleiveries"),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 18),
+                            child: boxDesign(Icons.person_add, "10 \nDeleiveries status\nPending"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),*/
+          customRow(
+            Icons.person_add,
+            "Total ANC",
+            "50",
+            size,
+            bgColor: Colors.green[200],
+            onTap: () {
+              // Your code to handle the tap event goes here
+            },
+          ),
+
+          Card(
+            elevation: 0,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () {
+                splashRadius: 30;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ANCPending(),
+                  ),
+                );
+                // Your code to handle the tap event goes here
+              },
+              child: customRow(
+                Icons.person_add,
+                "Pending ANC",
+                "10",
+                size,
+                bgColor: Colors.red[300],
+              ),
+            ),
+          ),
+
+          customRow(
+            Icons.person_add,
+            "Total Deleiveries",
+            "30",
+            size,
+            bgColor: Colors.green[200],
+            onTap: () {
+              // Your code to handle the tap event goes here
+            },
+          ),
+
+          Card(
+            elevation: 0,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () {
+                // Your code to handle the tap event goes here
+              },
+              child: customRow(
+                Icons.person_add,
+                "Deleiveries status Pending",
+                "10",
+                size,
+                bgColor: Colors.red[300],
+              ),
+            ),
+          ),
+          /*Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(
+                          top: 20,
+                          left: 25,
+                          right: 25,
+                        ),
+                        decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color: grey.withOpacity(0.03),
+                                spreadRadius: 10,
+                                blurRadius: 3,
+                                // changes position of shadow
+                              ),
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, bottom: 10, right: 20, left: 20),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: arrowbgColor,
+                                  borderRadius: BorderRadius.circular(15),
+                                  // shape: BoxShape.circle
+                                ),
+                                child: Center(
+                                    child: Icon(Icons.arrow_upward_rounded)),
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Expanded(
+                                child: Container(
+                                  width: (size.width - 90) * 0.7,
+                                  child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Sent",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              color: black,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          "Sending Payment to Clients",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: black.withOpacity(0.5),
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ]),
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "\$150",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: black),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),*/
+
+
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -315,13 +488,15 @@ class _HomescreenState extends State<GDMOHomescreen> {
                     color: Colors.black,
                     fontWeight: FontWeight.bold),
               ),
+              const SizedBox(
+                height: 20,
+              ),
             ],
           ),
         ],
       ),
     );
   }
-
   Future callbottom() {
     listpats.clear();
     return showModalBottomSheet(
@@ -385,7 +560,7 @@ class _HomescreenState extends State<GDMOHomescreen> {
                                     child: Text("Search")),
                                 record["code"] == 200
                                     ? MyListViewPatient(
-                                  patients: listpats, vnames: listvnames,ashanames:listashanames,)
+                                    patients: listpats, vnames: listvnames)
                                     : record["code"] == 404
                                     ? Text(record["msg"])
                                     : Text("")
@@ -403,9 +578,8 @@ class _HomescreenState extends State<GDMOHomescreen> {
 class MyListViewPatient extends StatelessWidget {
   final List<Patient> patients;
   final List<String> vnames;
-  final List<String> ashanames;
 
-  MyListViewPatient({required this.patients, required this.vnames,required this.ashanames});
+  MyListViewPatient({required this.patients, required this.vnames});
 
   @override
   Widget build(BuildContext context) {
@@ -431,7 +605,7 @@ class MyListViewPatient extends StatelessWidget {
                     context,
                     CupertinoPageRoute(
                         builder: (context) =>
-                            GdmoPatientSections(patients[index], vnames[index],ashanames[index])));
+                            UpdatePatient(patients[index], vnames[index])));
               },
               leading: Icon(Icons.person),
               trailing: Text(

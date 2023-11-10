@@ -953,7 +953,7 @@ class _UpdatePersonalState extends State<UpdatePersonal> {
     return TextFormField(
         controller: _DOB,
         decoration: InputDecoration(
-          labelText: 'Date of Birth of Mother',
+          labelText: 'Date of Birth',
           border: const OutlineInputBorder(),
           floatingLabelStyle: MaterialStateTextStyle.resolveWith(
                 (Set<MaterialState> states) {
@@ -963,7 +963,7 @@ class _UpdatePersonalState extends State<UpdatePersonal> {
               return TextStyle(color: color, letterSpacing: 1.3);
             },
           ),
-          hintText: "Enter Date of Birth of Mother",),
+          hintText: "Enter Date of Birth",),
         onTap: () async{
 
           DateTime? date = DateTime.now();

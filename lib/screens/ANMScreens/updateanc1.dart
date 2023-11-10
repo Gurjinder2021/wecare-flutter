@@ -442,7 +442,12 @@ class _UpdateAnc1State extends State<UpdateAnc1> {
   }
   Widget TextInputHightRisk1(){
 
-    return DropdownButtonFormField(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10), // Set the border radius here
+        color: widget.p.highRiskOrNot == true ? Colors.red[100] : null,
+      ),
+        child:DropdownButtonFormField(
       decoration: getinputstyle(
           hint:
           "High Risk"),
@@ -450,26 +455,38 @@ class _UpdateAnc1State extends State<UpdateAnc1> {
       items: [
         DropdownMenuItem(
             value:"1",
-            child: Text("Yes")),
+            child: Text("Yes" , //widget.p.highRiskOrNot == true? "Patient is high risk" :"Yes", //if you want to show specific message
+              style: TextStyle(
+              //fontSize: widget.p.highRiskOrNot == true? 20 : null, // Increase font size if highRiskOrNot is "1"
+              fontWeight: widget.p.highRiskOrNot == true ? FontWeight.bold : null, // Set to bold if highRiskOrNot is "1"
+              color: widget.p.highRiskOrNot == true ? Colors.black : null,
+            ),)),
         DropdownMenuItem(
             value:"0",
             child: Text("No")),
       ],
       value:
       _Anc1HighRisk.text,
+
       validator: (v) {
         if (v == null) {
           return "Please choose";
         }
         return null;
       },
-      onChanged: (v) {
+      onChanged: widget.p.highRiskOrNot == true
+          ? null
+          : (v) {
 
         _Anc1HighRisk.text=v.toString();
-
       },
+        onTap: () {
+          if (_Anc1HighRisk.text == "Yes") {
+            return null;
+          }
+        }
+    ),
     );
-
   }
   Widget TextInputHBLevel1(){
     return TextFormField(
